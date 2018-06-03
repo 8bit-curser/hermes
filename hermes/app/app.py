@@ -4,7 +4,9 @@ from flask import Flask
 from flask_migrate import Migrate
 from flask_sqlalchemy import SQLAlchemy
 
+from urls import map_urls
 from models import session
+
 
 app = Flask(__name__)
 app.config['TEMPLATES_AUTO_RELOAD'] = True
@@ -35,12 +37,7 @@ def init_sqlalchemy(app):
 
 
 init_sqlalchemy(app)
-
-
-@app.route('/')
-def index():
-    return 'Index2'
-
+map_urls(app)
 
 if __name__ == '__main__':
     app.run(host="0.0.0.0", debug=True)
