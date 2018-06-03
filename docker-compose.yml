@@ -1,0 +1,23 @@
+version: '2'
+
+volumes:
+  psqlvolumes:
+    driver: local
+
+services:
+ db:
+   image: postgres
+   ports:
+     - "5432:5432"
+   volumes:
+     - psqlvolumes:/var/lib/postgresql/data/
+
+ hermes:
+   restart: always
+   volumes:
+     - .:/hermes
+   build: .
+   ports:
+    - "5000:5000"
+   links:
+     - db
