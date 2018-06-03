@@ -1,17 +1,17 @@
-version: '2'
+version: '3'
 
 volumes:
   psqlvolumes:
     driver: local
 
 services:
+  
  db:
    image: postgres
    ports:
      - "5432:5432"
    volumes:
      - psqlvolumes:/var/lib/postgresql/data/
-
  hermes:
    restart: always
    volumes:
@@ -21,3 +21,27 @@ services:
     - "5000:5000"
    links:
      - db
+
+ rabbitmq:
+   image: rabbitmq
+
+ worker:
+   build: .
+   command: celery -A hermes.app.tasks worker --loglevel=INFO
+   volumes:
+     - .:/hermes
+   links:
+     - db
+     - rabbitmq
+
+ flower:
+   build: .
+   command: flower -A hermes.app.tasks --port=5555
+   volumes:
+     - .:/hermes
+   ports:
+     - "5555:5555"
+   links:
+     - db
+     - rabbitmq
+

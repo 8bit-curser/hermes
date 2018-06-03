@@ -1,2 +1,5 @@
 *.swp
+*.pyc
+*.cpython-36.pyc
 __pycache__
+*/__pychache__/*
