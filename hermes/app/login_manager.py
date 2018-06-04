@@ -27,7 +27,7 @@ def init_login_manager(app):
     @app.before_request
     def before_request():
         session.permanent = True
-        app.permanent_session_lifetime = timedelta(minutes=2)
+        app.permanent_session_lifetime = timedelta(minutes=5)
         session.modified = True
         g.user = current_user
 

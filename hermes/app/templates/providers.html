@@ -3,7 +3,7 @@
     <h3 class="card-title"> This are our providers </h3>
     <div class="list-group">
         {% for provider in providers %}
-            <a href="#" class="list-group-item list-group-item-action">{{provider.name}} {{provider.lastname}}</a>
+        <a href='{{url_for("provider", provider_id=provider.id)}}' class="list-group-item list-group-item-action">{{provider.name}} {{provider.lastname}}</a>
         {% endfor %}
     </div>
 {% endblock %}

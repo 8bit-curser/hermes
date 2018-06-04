@@ -22,6 +22,13 @@ def items():
 
 
 @login_required
+def item(item_id):
+    """Items detail view."""
+    item = Item.query.get(item_id)
+    return render_template('item.html', item=item)
+
+
+@login_required
 def providers():
     """Providers view."""
     providers = User.query.all()
@@ -30,6 +37,14 @@ def providers():
     providers = [prov for prov in providers
                  if prov.category == UserTypeEnum.provider]
     return render_template('providers.html', providers=providers)
+
+
+@login_required
+def provider(provider_id):
+    """Providers view."""
+    provider = User.query.get(provider_id)
+    items = Item.query.filter(Item.provier_id == provider_id)
+    return render_template('provider.html', provider=provider, items=items)
 
 
 @login_required
@@ -47,8 +62,8 @@ def requests():
                     amount=form.amount.data)
             session.add(request_)
             session.commit()
-            current_app.logger.info(form.amount)
-            ret = redirect(url_for('index'))
+            flash("Your order has been placed")
+            ret = redirect(url_for('requests'))
     return ret
 
 
@@ -106,4 +121,5 @@ def signup():
 def logout():
     """Log out a user."""
     logout_user()
-    return redirect(url_for('login'))
+    flash("You been logged out!")
+    return redirect(url_for('index'))

@@ -1,0 +1,9 @@
+{% extends 'layout.html' %}
+{% block content %}
+   <div class="card border-light mb-3" style="max-width: 100%;">
+           <div class="card-header">Item: {{item.title}}</div>
+           <div class="card-body">
+                <h5 class="card-title">Available: {{item.amount}}</h5>
+           </div>
+   </div>
+{% endblock %}

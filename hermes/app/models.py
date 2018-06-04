@@ -11,7 +11,7 @@ from sqlalchemy.orm import backref, relationship, scoped_session, sessionmaker
 
 from werkzeug.security import check_password_hash, generate_password_hash
 
-from .enums import UserTypeEnum
+from enums import UserTypeEnum
 
 
 engine = create_engine('postgresql://postgres@db/hermes')
