@@ -1,5 +1,6 @@
+.DS_STORE
 *.swp
 *.pyc
 *.cpython-36.pyc
 __pycache__
-*/__pychache__/*
+__pycache__

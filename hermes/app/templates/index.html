@@ -1,9 +1,12 @@
-<!DOCTYPE html>
-<html>
-        <head>
-            <title>Hermes</title>
-        </head>
-        <body>
-            <h1>Index</h1>
-        </body>
-</html>
+{% extends 'layout.html' %}
+{% block content %}
+    <div class="card-body text-center">
+        <img style="height: 200px; width: auto; display: inline-block; border-radius: 50%" src="{{url_for('static', filename='logo.jpg')}}" alt="Card image">
+    </div>
+    <div class="card-body text-center">
+            <blockquote class="blockquote text-center">
+                <p class="mb-0">A delivery system that exploits the capabilities of celery and rabbitmq.</p>
+                <p> Welcome {{user.name}}!</p>
+            </blockquote>
+    </div>
+{% endblock %}

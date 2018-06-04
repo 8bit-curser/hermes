@@ -129,6 +129,7 @@ class Request(Base):
 
     id = Column(String, primary_key=True, default=generate_uuid)
     active = Column(Boolean, default=True)
+    amount = Column(Integer)
     timestamp = Column(DateTime, default=datetime.now)
     item_id = Column(String, ForeignKey("items.id"))
     item = relationship("Item")

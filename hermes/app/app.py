@@ -6,10 +6,11 @@ from flask_sqlalchemy import SQLAlchemy
 
 from urls import map_urls
 from models import session
+from login_manager import init_login_manager
 
-
-app = Flask(__name__)
+app = Flask(__name__, static_url_path='')
 app.config['TEMPLATES_AUTO_RELOAD'] = True
+app.secret_key = 'bananas'
 
 
 def init_sqlalchemy(app):
@@ -37,6 +38,7 @@ def init_sqlalchemy(app):
 
 
 init_sqlalchemy(app)
+init_login_manager(app)
 map_urls(app)
 
 if __name__ == '__main__':
