@@ -1,5 +1,5 @@
-from views import (index, item, items, provider, providers, requests,
-                   login, logout, signup)
+from hermes.app.views import (index, item, items, login, logout, provider,
+                              providers, requests, signup)
 
 
 def map_urls(app):

@@ -14,7 +14,7 @@ from werkzeug.security import check_password_hash, generate_password_hash
 from enums import UserTypeEnum
 
 
-engine = create_engine('postgresql://postgres@db/hermes')
+engine = create_engine(environ.get('SQLALCHEMY_DATABASE_URI'))
 session = scoped_session(sessionmaker(engine))
 
 
@@ -112,7 +112,7 @@ class ItemType(Base):
 class Item(Base):
     """Item ORM representation."""
     __tablename__ = 'items'
-    
+
     id = Column(String, primary_key=True, default=generate_uuid)
     title = Column(String)
     amount = Column(Integer)

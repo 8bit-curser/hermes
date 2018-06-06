@@ -3,14 +3,16 @@ from flask import (abort, current_app, flash, redirect, render_template,
 
 from flask_login import current_user, login_required, login_user, logout_user
 
-from forms import LoginForm, RequestForm, SignUp
-from enums import UserTypeEnum
-from models import Item, User, Request, session
+from hermes.app.enums import UserTypeEnum
+from hermes.app.forms import LoginForm, RequestForm, SignUp
+from hermes.app.models import Item, Request, User, session
+from hermes.app.tasks import test_task
 
 
 @login_required
 def index():
     """Index view."""
+    test_task.delay()
     return render_template('index.html', user=current_user)
 
 

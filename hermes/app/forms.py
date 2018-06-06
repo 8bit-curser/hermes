@@ -3,7 +3,7 @@ from wtforms import (DecimalField, FloatField, Form, IntegerField, SelectField,
 from wtforms_components import TimeField
 from wtforms.fields.html5 import EmailField
 
-from models import Item
+from hermes.app.models import Item
 
 USER_LEVEL = {
     'client': 'client',

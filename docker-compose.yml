@@ -16,6 +16,8 @@ services:
    restart: always
    volumes:
      - .:/hermes
+   env_file:
+     - ./hermes/env/public
    build: .
    ports:
     - "5000:5000"
@@ -30,6 +32,8 @@ services:
    command: celery -A hermes.app.tasks worker --loglevel=INFO
    volumes:
      - .:/hermes
+   env_file:
+     - ./hermes/env/public
    links:
      - db
      - rabbitmq
@@ -39,6 +43,8 @@ services:
    command: flower -A hermes.app.tasks --port=5555
    volumes:
      - .:/hermes
+   env_file:
+     - ./hermes/env/public
    ports:
      - "5555:5555"
    links:

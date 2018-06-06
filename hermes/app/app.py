@@ -4,9 +4,9 @@ from flask import Flask
 from flask_migrate import Migrate
 from flask_sqlalchemy import SQLAlchemy
 
-from urls import map_urls
-from models import session
-from login_manager import init_login_manager
+from hermes.app.urls import map_urls
+from hermes.app.models import session
+from hermes.app.login_manager import init_login_manager
 
 app = Flask(__name__, static_url_path='')
 app.config['TEMPLATES_AUTO_RELOAD'] = True
@@ -25,7 +25,8 @@ def init_sqlalchemy(app):
         session.commit()
         return response
 
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres@db/hermes'
+    app.config['SQLALCHEMY_DATABASE_URI'] = environ.get(
+        'SQLALCHEMY_DATABASE_URI')
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     db = SQLAlchemy(app)
     app.db = db

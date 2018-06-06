@@ -1,0 +1,4 @@
+PYTHONPATH=.
+SQLALCHEMY_DATABASE_URI=postgresql://postgres@db/hermes
+CELERY_BROKER=pyamqp://guest@rabbitmq/
+CELERY_BACKEND=db+postgresql://postgres@db/celery
