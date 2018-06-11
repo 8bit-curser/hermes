@@ -109,7 +109,7 @@ def requests():
                 total_amount = form.amount.data * request_.item.price
                 mail_send.delay("""Your order will arrive in an estimate of:{}
                                    The total to pay is: {}"""
-                                           .format(10, total_amount))
+                                .format(10, total_amount))
             else:
                 flash("That amount excedes the one available for the item")
             ret = redirect(url_for('requests'))
