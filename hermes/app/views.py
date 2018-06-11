@@ -3,7 +3,7 @@ from flask import (abort, current_app, flash, redirect, render_template,
 
 from flask_login import current_user, login_required, login_user, logout_user
 
-from hermes.app.enums import UserTypeEnum
+from hermes.app.enums import RequestStateEnum, UserTypeEnum
 from hermes.app.forms import (ItemForm, ItemTypeForm, LoginForm, RequestForm,
                               SignUp)
 from hermes.app.models import Item, ItemType, Request, User, session
@@ -97,13 +97,22 @@ def requests():
             request_ = Request(
                     item_id=form.choice.data,
                     client_id=current_user.id,
-                    amount=form.amount.data)
+                    amount=form.amount.data,
+                    state=RequestStateEnum.ready)
             session.add(request_)
             session.commit()
-            flash("Your order has been placed")
+            if form.amount.data <= request_.item.amount:
+                flash("Your order has been placed")
+                request_.item.amount -= form.amount.data
+                session.commit()
+                from hermes.app.tasks import mail_send
+                total_amount = form.amount.data * request_.item.price
+                mail_send.delay("""Your order will arrive in an estimate of:{}
+                                   The total to pay is: {}"""
+                                           .format(10, total_amount))
+            else:
+                flash("That amount excedes the one available for the item")
             ret = redirect(url_for('requests'))
-            from hermes.app.tasks import mail_send
-            mail_send.delay()
     return ret
 
 
