@@ -21,12 +21,24 @@
                       <li class="nav-item">
                               <a class="nav-link" href="{{url_for('items')}}">Items</a>
                       </li>
+                      {% if current_user.category %}
+                        {% if current_user.category.value == 2 %}
+                            <li class="nav-item">
+                                <a class="nav-link" href="{{url_for('add_item')}}">Add Items</a>
+                            </li>
+                        {% endif %}
+                      {% endif %}
+
                       <li class="nav-item">
                               <a class="nav-link" href="{{url_for('providers')}}">Providers</a>
                       </li>
-                      <li class="nav-item">
-                              <a class="nav-link" href="{{url_for('requests')}}">Make your order!</a>
-                      </li>
+                      {% if current_user.category %}
+                        {% if current_user.category.value == 1 %}
+                            <li class="nav-item">
+                                <a class="nav-link" href="{{url_for('requests')}}">Make your order!</a>
+                            </li>
+                        {% endif %}
+                     {% endif %}
                   </ul>
                   {% if not current_user.is_authenticated %}
                     <a class="nav-link my-2 my-lg-0" href="{{url_for('signup')}}">

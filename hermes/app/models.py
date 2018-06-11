@@ -11,7 +11,7 @@ from sqlalchemy.orm import backref, relationship, scoped_session, sessionmaker
 
 from werkzeug.security import check_password_hash, generate_password_hash
 
-from enums import UserTypeEnum
+from hermes.app.enums import UserTypeEnum, RequestStateEnum
 
 
 engine = create_engine(environ.get('SQLALCHEMY_DATABASE_URI'))
@@ -119,7 +119,7 @@ class Item(Base):
     price = Column(Float)
     type_id = Column(String, ForeignKey("item_types.id"))
     type = relationship("ItemType")
-    provier_id = Column(String, ForeignKey("users.id"))
+    provider_id = Column(String, ForeignKey("users.id"))
     provider = relationship("User")
 
 
@@ -131,6 +131,7 @@ class Request(Base):
     active = Column(Boolean, default=True)
     amount = Column(Integer)
     timestamp = Column(DateTime, default=datetime.now)
+    state = Column(Enum(RequestStateEnum))
     item_id = Column(String, ForeignKey("items.id"))
     item = relationship("Item")
     client_id = Column(String, ForeignKey("users.id"))

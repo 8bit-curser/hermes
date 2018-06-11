@@ -4,6 +4,7 @@
            <div class="card-header">Item: {{item.title}}</div>
            <div class="card-body">
                 <h5 class="card-title">Available: {{item.amount}}</h5>
+                <a href={{url_for('provider', provider_id=item.provider.id)}} <p>{{item.provider.name}} {{item.provider.lastname}}</p>
            </div>
    </div>
 {% endblock %}

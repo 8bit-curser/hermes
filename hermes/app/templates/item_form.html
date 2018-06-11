@@ -1,0 +1,26 @@
+{% extends 'layout.html' %}
+{% block content %}
+    <div class="card-body">
+        <form method="POST" action="" class="form">
+          <div class="form-group">
+            {{form.title(class="form-control", placeholder="Item title")}}
+          </div>
+          <div class="form-group">
+            <label>Amount:</label>
+            {{form.amount(class="form-control", placeholder="Items available")}}
+          </div>
+          <div class="form-group">
+            <label>Price:</label>
+            {{form.price(class="form-control", placeholder="Item price")}}
+          </div>
+          <label>Category:</label>
+          <div class="form-group">
+            {{form.item_type(class="form-control")}}
+          </div>
+          <div class="form-group">
+            {{form.submit(class="btn btn-primary")}}
+          </div>
+        </form>
+        <a href="{{url_for('add_item_type')}}"><h5> If your category is not available add it! </h5></a>
+   </div>
+{% endblock %}

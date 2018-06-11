@@ -4,15 +4,14 @@ from flask import (abort, current_app, flash, redirect, render_template,
 from flask_login import current_user, login_required, login_user, logout_user
 
 from hermes.app.enums import UserTypeEnum
-from hermes.app.forms import LoginForm, RequestForm, SignUp
-from hermes.app.models import Item, Request, User, session
-from hermes.app.tasks import test_task
+from hermes.app.forms import (ItemForm, ItemTypeForm, LoginForm, RequestForm,
+                              SignUp)
+from hermes.app.models import Item, ItemType, Request, User, session
 
 
 @login_required
 def index():
     """Index view."""
-    test_task.delay()
     return render_template('index.html', user=current_user)
 
 
@@ -31,11 +30,48 @@ def item(item_id):
 
 
 @login_required
+def add_item():
+    """Add item registry view."""
+    form = ItemForm(request.form)
+    ret = None
+    if request.method == 'GET':
+        ret = render_template('item_form.html', form=form)
+    else:
+        if form.validate():
+            item = Item(
+                    title=form.title.data,
+                    amount=form.amount.data,
+                    price=form.price.data,
+                    type_id=form.item_type.data,
+                    provider_id=current_user.id)
+            session.add(item)
+            session.commit()
+            flash('Your item has been added!')
+            ret = redirect(url_for('item', item_id=item.id))
+    return ret
+
+
+@login_required
+def add_item_type():
+    """Add item type registry view."""
+    form = ItemTypeForm(request.form)
+    ret = None
+    if request.method == 'GET':
+        ret = render_template('item_type_form.html', form=form)
+    else:
+        if form.validate():
+            item_type = ItemType(title=form.title.data)
+            session.add(item_type)
+            session.commit()
+            flash('Your item type has been added!')
+            ret = redirect(url_for('add_item'))
+    return ret
+
+
+@login_required
 def providers():
     """Providers view."""
     providers = User.query.all()
-    current_app.logger.info(providers[1].category)
-    current_app.logger.info(UserTypeEnum.provider)
     providers = [prov for prov in providers
                  if prov.category == UserTypeEnum.provider]
     return render_template('providers.html', providers=providers)
@@ -45,7 +81,7 @@ def providers():
 def provider(provider_id):
     """Providers view."""
     provider = User.query.get(provider_id)
-    items = Item.query.filter(Item.provier_id == provider_id)
+    items = Item.query.filter(Item.provider_id == provider_id)
     return render_template('provider.html', provider=provider, items=items)
 
 
@@ -66,6 +102,8 @@ def requests():
             session.commit()
             flash("Your order has been placed")
             ret = redirect(url_for('requests'))
+            from hermes.app.tasks import mail_send
+            mail_send.delay()
     return ret
 
 

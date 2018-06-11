@@ -3,7 +3,7 @@ from datetime import timedelta
 from flask import g, redirect, request, session, url_for
 from flask_login import LoginManager, current_user
 
-from models import User
+from hermes.app.models import User
 
 
 def init_login_manager(app):
