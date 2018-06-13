@@ -10,7 +10,7 @@ USER_LEVEL = {
     'provider': 'provider',
 }
 
-
+# FIXME: When an ItemType has been added it doesnt show on the ItemForm later
 
 class LoginForm(Form):
     """Gives a form to login a user."""

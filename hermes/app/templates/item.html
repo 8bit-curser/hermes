@@ -1,6 +1,15 @@
 {% extends 'layout.html' %}
 {% block content %}
+    
    <div class="card border-light mb-3" style="max-width: 100%;">
+        <form class='form-inline' action="{{url_for('restock', item_id=item.id)}}">
+            <div class="form-group mb-2">
+                <label class="sr-only">Amount to restock</label>
+                <input type="number" name="amount">
+            </div>
+            <button type="submit" class="btn btn-primary" >Restock!</button>
+        </form>
+
            <div class="card-header">Item: {{item.title}}</div>
            <div class="card-body">
                 <h5 class="card-title">Available: {{item.amount}}</h5>

@@ -9,6 +9,8 @@ from hermes.app.forms import (ItemForm, ItemTypeForm, LoginForm, RequestForm,
 from hermes.app.models import Item, ItemType, Request, User, session
 
 
+# FIXME: Only the user that created the item is the one that can edit or
+# restock it
 @login_required
 def index():
     """Index view."""
@@ -26,12 +28,38 @@ def items():
 def item(item_id):
     """Items detail view."""
     item = Item.query.get(item_id)
-    return render_template('item.html', item=item)
+    reqs = Request.query.filter(Request.item_id == item_id,
+                                Request.state == RequestStateEnum.sent).all()
+    total_amounts = sum([req.amount for req in reqs])
+    if total_amounts > 0:
+        flash("Hey you need to restock this item for a min of {}"
+              .format(str(total_amounts - item.amount)))
+
+    return render_template('item.html', item=item, amount=total_amounts)
+
+
+@login_required
+def restock(item_id):
+    item = Item.query.get(item_id)
+    amount = int(request.args.get('amount', 0))
+    reqs = Request.query.filter(Request.item_id == item_id,
+                                Request.state == RequestStateEnum.sent).all()
+    total_amounts = sum([req.amount for req in reqs])
+    if (total_amounts - item.amount) > amount:
+        flash('That amount is below the minimun!')
+    else:
+        item.amount += amount
+        session.commit()
+        flash('Your item has been restocked for {}'.format(amount))
+        from hermes.app.tasks import update_item_after_restock, update_reqs
+        update_reqs.delay(item_id)
+
+    return redirect(url_for('item', item_id=item_id))
 
 
 @login_required
 def add_item():
-    """Add item registry view."""
+    """Add item  view."""
     form = ItemForm(request.form)
     ret = None
     if request.method == 'GET':
@@ -39,11 +67,11 @@ def add_item():
     else:
         if form.validate():
             item = Item(
-                    title=form.title.data,
-                    amount=form.amount.data,
-                    price=form.price.data,
-                    type_id=form.item_type.data,
-                    provider_id=current_user.id)
+                title=form.title.data,
+                amount=form.amount.data,
+                price=form.price.data,
+                type_id=form.item_type.data,
+                provider_id=current_user.id)
             session.add(item)
             session.commit()
             flash('Your item has been added!')
@@ -88,31 +116,43 @@ def provider(provider_id):
 @login_required
 def requests():
     """Requests view."""
+    # TODO: The email messages must be moved to constants
     form = RequestForm(request.form)
     ret = None
     if request.method == 'GET':
         ret = render_template('requests.html', form=form, user=current_user)
     else:
+        from hermes.app.tasks import mail_send
         if form.validate():
             request_ = Request(
-                    item_id=form.choice.data,
-                    client_id=current_user.id,
-                    amount=form.amount.data,
-                    state=RequestStateEnum.ready)
+                item_id=form.choice.data,
+                client_id=current_user.id,
+                amount=form.amount.data,
+                state=RequestStateEnum.ready)
             session.add(request_)
             session.commit()
+            flash("Your order has been placed")
+            total_amount = form.amount.data * request_.item.price
             if form.amount.data <= request_.item.amount:
-                flash("Your order has been placed")
                 request_.item.amount -= form.amount.data
+                request_.state = RequestStateEnum.done
                 session.commit()
-                from hermes.app.tasks import mail_send
-                total_amount = form.amount.data * request_.item.price
-                mail_send.delay("""Your order will arrive in an estimate of:{}
-                                   The total to pay is: {}"""
-                                .format(10, total_amount))
             else:
-                flash("That amount excedes the one available for the item")
+                min_amnt = form.amount.data - request_.item.amount
+                # This mail goes to the provider
+                mail_send.delay(
+                    """An order has been placed that excedes the amount of
+                    items currently available for {}, a minimun of that amount
+                    extra is required.
+                    For item {}""".format(str(min_amnt), request_.item.title))
+                request_.state = RequestStateEnum.sent
+                session.commit()
             ret = redirect(url_for('requests'))
+            # This mail goes to the user that required the product
+            mail_send.delay(
+                """Your order will arrive in an estimate of:{}
+                   The total to pay is: {}""".format(10, total_amount))
+
     return ret
 
 
