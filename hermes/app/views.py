@@ -52,7 +52,7 @@ def restock(item_id):
         session.commit()
         flash('Your item has been restocked for {}'.format(amount))
         from hermes.app.tasks import update_item_after_restock, update_reqs
-        update_reqs.delay(item_id)
+        update_item_after_restock.delay(item_id)
 
     return redirect(url_for('item', item_id=item_id))
 

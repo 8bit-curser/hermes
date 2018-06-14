@@ -25,21 +25,6 @@ def mail_send(msg):
 
 
 @app.task
-def update_item_after_restock(item_id):
-    """After requests have been updated the amounts should be substracted.
-    Arguments:
-        reqs -- collection of requests
-    """
-    reqs = Request.query.filter(Request.item_id == item_id,
-                                Request.state == RequestStateEnum.sent).all()
-
-    total_amounts = sum([req.amount for req in reqs])
-    item = Item.query.get(item_id)
-    item.amount -= total_amounts
-    session.commit()
-
-
-@app.task
 def update_reqs(item_id):
     """After restocking update all requests as done.
     Arguments:
@@ -51,4 +36,22 @@ def update_reqs(item_id):
         req.state = RequestStateEnum.done
         session.commit()
 
-    update_item_after_restock.delay(item_id)
+
+@app.task
+def update_item_after_restock(item_id):
+    """After requests have been updated the amounts should be substracted.
+    Arguments:
+        reqs -- collection of requests
+    """
+    reqs = Request.query.filter(Request.item_id == item_id,
+                                Request.state == RequestStateEnum.sent).all()
+
+    total_amounts = sum([req.amount for req in reqs])
+    item = Item.query.get(item_id)
+    item.amount = total_amounts - item.amount
+    session.commit()
+
+    update_reqs.delay(item_id)
+
+
+
